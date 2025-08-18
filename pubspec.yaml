@@ -40,6 +40,9 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   file_logger: ^1.1.1
   quickalert: ^1.1.0
+  logger: ^2.6.1
+  equatable: ^2.0.7
+  bloc: ^9.0.0
 
 dev_dependencies:
   flutter_test:
