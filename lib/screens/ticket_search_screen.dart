@@ -56,7 +56,7 @@ class TicketSearchScreen extends StatelessWidget {
                           child: SizedBox(
                             width: MediaQuery.of(context).size.width * 0.4,
                             child: Card(
-                              elevation: 4,
+                              elevation: 14,
                               margin: const EdgeInsets.symmetric(vertical: 8.0),
                               child: Padding(
                                 padding: const EdgeInsets.all(12.0),
@@ -64,13 +64,21 @@ class TicketSearchScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Ticket #${ticket.ticketNumber}',
+                                      'Номер вещи ${ticket.ticketObjectNumber}',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
-                                    Text(ticket.ticketName),
+                                    Row(
+                                      children: [
+                                        Text(ticket.ticketObjectName),
+                                        const SizedBox(width: 12),
+                                        Text(ticket.sellPrice.toString()),
+                                        const SizedBox(width: 12),
+                                        Text(ticket.soldDate),
+                                      ],
+                                    ),
                                     // Add more fields later
                                     const Divider(),
                                     Align(
@@ -80,8 +88,8 @@ class TicketSearchScreen extends StatelessWidget {
                                           context.goNamed(
                                             'ticketdetail',
                                             pathParameters: {
-                                              'ticketNumber':
-                                                  ticket.ticketNumber,
+                                              'ticketObjectId':
+                                                  ticket.ticketObjectId,
                                             },
                                           );
 

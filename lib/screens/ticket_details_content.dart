@@ -12,7 +12,7 @@ class TicketDetailsContent extends StatelessWidget {
   Widget build(BuildContext context) {
     // Make a copy of controllers for editable fields
     final TextEditingController nameController = TextEditingController(
-      text: ticket.ticketName,
+      text: ticket.ticketObjectName,
     );
     final TextEditingController numberController = TextEditingController(
       text: ticket.ticketNumber,

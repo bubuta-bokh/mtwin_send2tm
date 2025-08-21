@@ -50,7 +50,7 @@ void main() async {
                 ctx,
               );
               return TicketBloc(ticketRepository: ticketRepository)
-                ..add(const TicketInitialEvent(envi: 'DEBUG'));
+                ..add(const TicketInitialEvent(envi: 'PROD'));
             },
             lazy: false,
           ),
@@ -82,10 +82,10 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       name: "ticketdetail",
-      path: '/ticketDetail/:ticketNumber',
+      path: '/ticketDetail/:ticketObjectId',
       builder: (BuildContext context, GoRouterState state) {
         return TicketDetailsScreen(
-          ticketNumber: state.pathParameters['ticketNumber']!,
+          ticketObjectId: state.pathParameters['ticketObjectId']!,
         );
       },
     ),

@@ -4,9 +4,9 @@ import 'package:mtwin_send2tm/bloc/ticket_bloc/ticket_bloc.dart';
 import 'package:mtwin_send2tm/screens/ticket_details_content.dart';
 
 class TicketDetailsScreen extends StatelessWidget {
-  final String? ticketNumber; // received as path parameter
+  final String? ticketObjectId; // received as path parameter
 
-  const TicketDetailsScreen({super.key, required this.ticketNumber});
+  const TicketDetailsScreen({super.key, required this.ticketObjectId});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class TicketDetailsScreen extends StatelessWidget {
         if (state is SearchTicketLoaded) {
           // Find the ticket in the state
           final ticket = state.ticketsToSend.firstWhere(
-            (t) => t.ticketNumber == ticketNumber,
+            (t) => t.ticketObjectId == ticketObjectId,
           );
           if (ticket == null) {
             return Scaffold(body: Center(child: Text('Ticket not found!')));

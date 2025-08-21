@@ -9,6 +9,7 @@ part 'ticket_state.dart';
 
 class TicketBloc extends Bloc<TicketEvent, TicketState> {
   final TicketRepository ticketRepository;
+  List<TicketDto>? ticketDto;
 
   final logger = Logger(printer: PrettyPrinter());
 
@@ -20,6 +21,16 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
 
     on<TicketSearchEvent>((event, emit) async {
       logger.i('Inside ticket bloc line 22');
+      emit(SearchTicketLoading());
+
+      ticketDto = await ticketRepository.searchSoldTickets(
+        searchQuery: event.searchQuery,
+      );
+      if (ticketDto == null) {
+        emit(SearchTicketError('Не удалось получить данные с сервера.'));
+      } else {
+        emit(SearchTicketLoaded(ticketDto!));
+      }
     });
   }
 }
