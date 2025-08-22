@@ -22,5 +22,10 @@ class DmdkBloc extends Bloc<DmdkEvent, DmdkState> {
       //logger.i("Inside BLOC, before health request is made");
       //var isSuccessfull = await dmdkRepository.makeHealthRequest();
     });
+
+    on<ProcessTicketSendEvent>((event, emit) async {
+      //logger.i("Inside BLOC, before health request is made");
+      //var isSuccessfull = await dmdkRepository.makeHealthRequest();
+    });
   }
 }

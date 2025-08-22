@@ -17,9 +17,10 @@ class TicketInitialEvent extends TicketEvent {
 
 class TicketSearchEvent extends TicketEvent {
   final String searchQuery;
+  final int? qty;
 
-  const TicketSearchEvent({required this.searchQuery});
+  const TicketSearchEvent({required this.searchQuery, required this.qty});
 
   @override
-  List<Object> get props => [searchQuery];
+  List<Object> get props => [searchQuery, qty ?? 5];
 }

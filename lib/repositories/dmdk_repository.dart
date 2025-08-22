@@ -9,6 +9,11 @@ class DmdkRepository {
     return dio;
   }
 
+  final String fn = '7380440800954751';
+  final String inn = '7810243050';
+  final String kpp = '784201001';
+  final String address = '197198, г.Санкт-Петербург, ул.Ижорская, д.13/39';
+
   Future<String> makeHealthRequest() async {
     //logger.i('We are inside of makeHealthRequest');
 

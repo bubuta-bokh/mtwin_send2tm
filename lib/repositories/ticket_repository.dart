@@ -42,14 +42,21 @@ class TicketRepository {
     return passPhrase;
   }
 
-  Future<List<TicketDto>> searchSoldTickets({String? searchQuery}) async {
+  Future<List<TicketDto>> searchSoldTickets({
+    String? searchQuery,
+    int qty = 5,
+  }) async {
     try {
       DateTime now = DateTime.now();
       String passPhrase = generatePassphrase(now);
       searchQuery ??= '';
       var response = await dio.get(
         'SearchSoldTicketObjectsTm',
-        queryParameters: {'searchQuery': searchQuery, 'token': passPhrase},
+        queryParameters: {
+          'searchQuery': searchQuery,
+          'token': passPhrase,
+          'qty': qty,
+        },
       );
       final int? statusCode = response.statusCode;
       if (statusCode! < 200 || statusCode > 400) {

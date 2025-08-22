@@ -50,7 +50,7 @@ void main() async {
                 ctx,
               );
               return TicketBloc(ticketRepository: ticketRepository)
-                ..add(const TicketInitialEvent(envi: 'PROD'));
+                ..add(const TicketInitialEvent(envi: 'DEBUG'));
             },
             lazy: false,
           ),
@@ -69,6 +69,7 @@ final GoRouter _router = GoRouter(
   routes: <RouteBase>[
     GoRoute(
       path: '/',
+      name: "home",
       builder: (BuildContext context, GoRouterState state) {
         //return const MainScreen();
         return const TicketSearchScreen();

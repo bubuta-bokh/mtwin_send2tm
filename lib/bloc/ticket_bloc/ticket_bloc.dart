@@ -25,6 +25,7 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
 
       ticketDto = await ticketRepository.searchSoldTickets(
         searchQuery: event.searchQuery,
+        qty: event.qty ?? 5,
       );
       if (ticketDto == null) {
         emit(SearchTicketError('Не удалось получить данные с сервера.'));

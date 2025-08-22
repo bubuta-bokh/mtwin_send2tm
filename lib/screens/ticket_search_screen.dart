@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mtwin_send2tm/bloc/ticket_bloc/ticket_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mtwin_send2tm/components/main_components/app_bar.dart';
 
 class TicketSearchScreen extends StatelessWidget {
   const TicketSearchScreen({super.key});
@@ -9,9 +10,12 @@ class TicketSearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController queryController = TextEditingController();
+    final TextEditingController qtyController = TextEditingController();
+    qtyController.text = '5';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Search Tickets')),
+      appBar:
+          appBarWithAllTokens(), //AppBar(title: const Text('Search Tickets')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -23,7 +27,20 @@ class TicketSearchScreen extends StatelessWidget {
                   child: TextField(
                     controller: queryController,
                     decoration: const InputDecoration(
-                      labelText: 'Введите номер или часть номер ЗБ',
+                      labelText:
+                          'Введите номер или часть номер ЗБ или оставьте пустым для всех',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  width: 90,
+                  child: TextField(
+                    controller: qtyController,
+                    textAlign: TextAlign.center,
+                    decoration: InputDecoration(
+                      labelText: 'Кол-во',
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -31,9 +48,13 @@ class TicketSearchScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 IconButton(
                   icon: const Icon(Icons.search),
+
                   onPressed: () {
                     context.read<TicketBloc>().add(
-                      TicketSearchEvent(searchQuery: queryController.text),
+                      TicketSearchEvent(
+                        searchQuery: queryController.text,
+                        qty: int.tryParse(qtyController.text),
+                      ),
                     );
                   },
                 ),
@@ -54,7 +75,7 @@ class TicketSearchScreen extends StatelessWidget {
                         final ticket = tickets[index];
                         return Center(
                           child: SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.4,
+                            width: MediaQuery.of(context).size.width * 0.5,
                             child: Card(
                               elevation: 14,
                               margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -63,20 +84,42 @@ class TicketSearchScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      'Номер вещи ${ticket.ticketObjectNumber}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          ticket.ticketObjectNumber,
+                                          style: const TextStyle(
+                                            letterSpacing: 1.7,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          ticket.uin,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 2,
+                                            color: Colors.black38,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     const SizedBox(height: 8),
                                     Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(ticket.ticketObjectName),
-                                        const SizedBox(width: 12),
-                                        Text(ticket.sellPrice.toString()),
-                                        const SizedBox(width: 12),
-                                        Text(ticket.soldDate),
+
+                                        Text(
+                                          'от ${ticket.soldDateReadable}',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            letterSpacing: 1,
+                                            color: Colors.black,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                     // Add more fields later
@@ -92,18 +135,8 @@ class TicketSearchScreen extends StatelessWidget {
                                                   ticket.ticketObjectId,
                                             },
                                           );
-
-                                          // Navigator.push(
-                                          //   context,
-                                          //   MaterialPageRoute(
-                                          //     builder: (_) =>
-                                          //         TicketDetailsScreen(
-                                          //           ticket: ticket,
-                                          //         ),
-                                          //   ),
-                                          // );
                                         },
-                                        child: const Text('Open'),
+                                        child: const Text('подробнее...'),
                                       ),
                                     ),
                                   ],
@@ -122,7 +155,9 @@ class TicketSearchScreen extends StatelessWidget {
                       ),
                     );
                   }
-                  return const Center(child: Text('Enter query to search'));
+                  return const Center(
+                    child: Text('Начните искать проданные вещи...'),
+                  );
                 },
               ),
             ),
