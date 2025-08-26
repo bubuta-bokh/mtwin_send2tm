@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:mtwin_send2tm/bloc/dmdk_bloc/dmdk_bloc.dart';
 import 'package:mtwin_send2tm/bloc/ticket_bloc/ticket_bloc.dart';
+import 'package:mtwin_send2tm/entities/snackbar_global.dart';
 import 'dart:ui';
 
 import 'package:mtwin_send2tm/repositories/dmdk_repository.dart';
@@ -50,7 +51,7 @@ void main() async {
                 ctx,
               );
               return TicketBloc(ticketRepository: ticketRepository)
-                ..add(const TicketInitialEvent(envi: 'DEBUG'));
+                ..add(const TicketInitialEvent(envi: 'PROD'));
             },
             lazy: false,
           ),
@@ -126,6 +127,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       locale: const Locale('ru', 'RU'),
       theme: ThemeData(fontFamily: 'Rubik', primarySwatch: Colors.blueGrey),
+
+      //supportedLocales: const [Locale('ru', '')],
+      scaffoldMessengerKey: SnackbarGlobal.key,
     );
   }
 }
