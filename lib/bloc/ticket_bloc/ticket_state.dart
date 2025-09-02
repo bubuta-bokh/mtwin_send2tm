@@ -11,6 +11,8 @@ final class TicketInitial extends TicketState {}
 
 final class SearchTicketLoading extends TicketState {}
 
+final class DoneWithThisTOState extends TicketState {}
+
 final class SearchTicketError extends TicketState {
   final String message;
 

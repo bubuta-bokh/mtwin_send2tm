@@ -10,7 +10,7 @@ import 'dart:ui';
 import 'package:mtwin_send2tm/repositories/dmdk_repository.dart';
 import 'package:mtwin_send2tm/repositories/ticket_repository.dart';
 import 'package:mtwin_send2tm/screens/health_request_screen.dart';
-import 'package:mtwin_send2tm/screens/main_screen.dart';
+//import 'package:mtwin_send2tm/screens/main_screen.dart';
 // import 'package:mtwin_send2tm/screens/ticket_details_content.dart';
 import 'package:mtwin_send2tm/screens/ticket_details_screen.dart';
 import 'package:mtwin_send2tm/screens/ticket_search_screen.dart';
@@ -50,8 +50,11 @@ void main() async {
               final ticketRepository = RepositoryProvider.of<TicketRepository>(
                 ctx,
               );
-              return TicketBloc(ticketRepository: ticketRepository)
-                ..add(const TicketInitialEvent(envi: 'PROD'));
+              final dmdkBloc = BlocProvider.of<DmdkBloc>(ctx);
+              return TicketBloc(
+                ticketRepository: ticketRepository,
+                dmdkBloc: dmdkBloc,
+              )..add(const TicketInitialEvent(envi: 'DEBUG'));
             },
             lazy: false,
           ),

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:logger/logger.dart';
@@ -26,35 +28,46 @@ class DmdkBloc extends Bloc<DmdkEvent, DmdkState> {
 
     on<ProcessTicketSendEvent>((event, emit) async {
       logger.i("Inside BLOC, before xml is born");
+      emit(DmdkFileSentWithSuccessState(ticketDto: event.ticketForTM));
+      return;
+      emit(DmdkFileSentWithSuccessState(ticketDto: event.ticketForTM));
       try {
-        var file = await dmdkRepository.createChequeXmlFile(
+        var bytes = await dmdkRepository.createChequeXmlFile(
           ticket: event.ticketForTM,
         );
-        if (file == null) {
-          SnackbarGlobal.show('Не удалось создать XML файл.', 10, 'warn');
-          return;
-        } else {
-          try {
-            var rslt = await dmdkRepository.sendChequeXmlFile(
-              file: file,
-              fileName: '${event.ticketForTM.ticketObjectNumber}.xml',
-            );
-            if (rslt.contains('error')) {
-              SnackbarGlobal.show(rslt, 20, 'error');
-            } else {
-              SnackbarGlobal.show(rslt, 20, 'success');
-            }
-          } catch (e) {
+        SnackbarGlobal.show(
+          '✅ Файл успешно создан в памяти. Размер: ${bytes.length} байт.',
+          7,
+          'success',
+        );
+
+        try {
+          var rslt = await dmdkRepository.sendChequeXmlFile(xmlBytes: bytes);
+          if (!rslt.contains('error')) {
             SnackbarGlobal.show(
-              'Не удалось отправить XML файл. $e',
+              '✅ Файл успешно отправлен в ТМ: $rslt,',
               20,
-              'error',
+              'success',
             );
+
+            emit(DmdkFileSentWithSuccessState(ticketDto: event.ticketForTM));
+          } else {
+            SnackbarGlobal.show(rslt, 20, 'error');
           }
+        } catch (e, s) {
+          SnackbarGlobal.show(
+            'Не удалось отправить XML файл в ТМ. Ошибка: $e, stack trace: $s',
+            20,
+            'error',
+          );
         }
-      } catch (e) {
+      } catch (e, s) {
         //myLogger.e(e.toString());
-        SnackbarGlobal.show(e.toString(), 20, 'error');
+        SnackbarGlobal.show(
+          'Не удалось создать XML-файл, ошибка: $e, stack trace: $s',
+          20,
+          'error',
+        );
         //var isSuccessfull = await dmdkRepository.makeHealthRequest();
       }
     });

@@ -56,6 +56,7 @@ class TicketRepository {
           'searchQuery': searchQuery,
           'token': passPhrase,
           'qty': qty,
+          'doLog': true,
         },
       );
       final int? statusCode = response.statusCode;
@@ -70,6 +71,34 @@ class TicketRepository {
           rslt.add(TicketDto.fromJson(element));
         }
         return rslt;
+      }
+    } on DioException catch (e) {
+      return throw Exception(e);
+    } on Exception catch (e) {
+      return throw Exception(e);
+    }
+  }
+
+  Future<bool> markTicketAsSentToTM(TicketDto ticketDto) async {
+    try {
+      DateTime now = DateTime.now();
+      String passPhrase = generatePassphrase(now);
+
+      var response = await dio.post(
+        'MarkTicketAsSentToTM',
+        data: {
+          'ticketObjectId': ticketDto.ticketObjectId,
+          'token': passPhrase,
+          'doLog': true,
+        },
+      );
+      final int? statusCode = response.statusCode;
+      if (statusCode! < 200 || statusCode > 400) {
+        throw Exception(
+          "Сервер бэк-энда вернул статус-код ошибки: $statusCode.",
+        );
+      } else {
+        return response.data as bool;
       }
     } on DioException catch (e) {
       return throw Exception(e);

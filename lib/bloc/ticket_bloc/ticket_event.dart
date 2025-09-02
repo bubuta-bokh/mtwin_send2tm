@@ -24,3 +24,21 @@ class TicketSearchEvent extends TicketEvent {
   @override
   List<Object> get props => [searchQuery, qty ?? 5];
 }
+
+class TicketMakeTOSentEvent extends TicketEvent {
+  final TicketDto ticketDto;
+
+  const TicketMakeTOSentEvent({required this.ticketDto});
+
+  @override
+  List<Object> get props => [ticketDto];
+}
+
+class TicketMarkTOAsSentToTMEvent extends TicketEvent {
+  final TicketDto ticketDto;
+
+  const TicketMarkTOAsSentToTMEvent({required this.ticketDto});
+
+  @override
+  List<Object> get props => [ticketDto];
+}
