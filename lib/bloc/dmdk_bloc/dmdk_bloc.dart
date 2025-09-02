@@ -28,8 +28,8 @@ class DmdkBloc extends Bloc<DmdkEvent, DmdkState> {
 
     on<ProcessTicketSendEvent>((event, emit) async {
       logger.i("Inside BLOC, before xml is born");
-      emit(DmdkFileSentWithSuccessState(ticketDto: event.ticketForTM));
-      return;
+      //emit(DmdkFileSentWithSuccessState(ticketDto: event.ticketForTM));
+      //return;
       emit(DmdkFileSentWithSuccessState(ticketDto: event.ticketForTM));
       try {
         var bytes = await dmdkRepository.createChequeXmlFile(

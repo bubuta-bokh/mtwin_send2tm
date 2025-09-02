@@ -54,7 +54,7 @@ void main() async {
               return TicketBloc(
                 ticketRepository: ticketRepository,
                 dmdkBloc: dmdkBloc,
-              )..add(const TicketInitialEvent(envi: 'DEBUG'));
+              )..add(const TicketInitialEvent(envi: 'PROD'));
             },
             lazy: false,
           ),

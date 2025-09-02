@@ -27,6 +27,7 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
         //logger.i('DMDK file was sent successfully!');
         //var rslt = ticketRepository.markTicketAsSentToTM(dmdkState.ticketDto);
         // SnackbarGlobal.show('TicketBloc L30', 10, 'warn');
+
         add(TicketMarkTOAsSentToTMEvent(ticketDto: dmdkState.ticketDto));
       }
     });
@@ -37,7 +38,7 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
     });
 
     on<TicketMarkTOAsSentToTMEvent>((event, emit) async {
-      //logger.i('Inside ticket bloc line 21');
+      emit(TicketStartTransferState());
       try {
         var succeded = await ticketRepository.markTicketAsSentToTM(
           event.ticketDto,
@@ -54,7 +55,7 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
                 element.ticketObjectId == event.ticketDto.ticketObjectId,
           );
 
-          emit(DoneWithThisTOState());
+          emit(SearchTicketLoaded(ticketDto!));
         } else {
           SnackbarGlobal.show(
             'Вещь НЕ была отмечена как отправленная на ТМ.',
@@ -98,8 +99,8 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
             return;
           } else {
             SnackbarGlobal.show(
-              'Данные с сервера успешно получены!',
-              20,
+              'Данные о вещах для отправки в ТМ с бэк-энда успешно получены!',
+              7,
               'success',
             );
           }

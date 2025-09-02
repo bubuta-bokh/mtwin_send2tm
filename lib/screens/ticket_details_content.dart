@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mtwin_send2tm/bloc/dmdk_bloc/dmdk_bloc.dart';
+import 'package:mtwin_send2tm/bloc/ticket_bloc/ticket_bloc.dart';
 import 'package:mtwin_send2tm/entities/ticket_dto.dart';
 
 class TicketDetailsContent extends StatelessWidget {
@@ -11,8 +12,6 @@ class TicketDetailsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Make a copy of controllers for editable fields
-
     final TextEditingController ticketNumberController = TextEditingController(
       text: ticket.ticketNumber,
     );
@@ -36,77 +35,103 @@ class TicketDetailsContent extends StatelessWidget {
       text: ticket.uin,
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(ticket.ticketObjectName),
-        backgroundColor: Colors.tealAccent[700],
-        leading: Material(
-          color: Colors.transparent,
-          child: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              color: Theme.of(context).primaryColor,
-            ),
-            onPressed: () => context.goNamed('home'),
-            splashRadius: 24,
-            tooltip: 'На страницу поиска',
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+    return BlocConsumer<TicketBloc, TicketState>(
+      listener: (context, state) {
+        //if (state is DoneWithThisTOState) {
+        if (state is SearchTicketLoaded) {
+          context.goNamed('home');
+        }
+      },
+      builder: (context, state) {
+        final bool isLoading = state is TicketStartTransferState;
 
-        child: ListView(
+        return Stack(
           children: [
-            _buildEditableField('Номер ЗБ', ticketNumberController, true),
-            const SizedBox(height: 12),
-            _buildEditableField(
-              'Номер вещи',
-              ticketObjectNumberController,
-              true,
+            Scaffold(
+              appBar: AppBar(
+                title: Text(ticket.ticketObjectName),
+                backgroundColor: Colors.tealAccent[700],
+                leading: Material(
+                  color: Colors.transparent,
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios_new,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    onPressed: () => context.goNamed('home'),
+                    splashRadius: 24,
+                    tooltip: 'На страницу поиска',
+                  ),
+                ),
+              ),
+              body: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ListView(
+                  children: [
+                    _buildEditableField(
+                      'Номер ЗБ',
+                      ticketNumberController,
+                      true,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildEditableField(
+                      'Номер вещи',
+                      ticketObjectNumberController,
+                      true,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildEditableField(
+                      'Дата продажи для ТМ',
+                      soldDateController,
+                      false,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildEditableField(
+                      'Название вещи',
+                      ticketObjectNameController,
+                      false,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildEditableField('Номер чека', chequeController, false),
+                    const SizedBox(height: 12),
+                    _buildEditableField('Номер смены', shiftController, false),
+                    const SizedBox(height: 12),
+                    _buildEditableField(
+                      'Сумма продажи',
+                      sellPriceController,
+                      false,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildEditableField('УИН', uinController, true),
+                  ],
+                ),
+              ),
+              floatingActionButton: FloatingActionButton(
+                child: const Icon(Icons.play_arrow),
+                onPressed: () {
+                  final updatedTicket = ticket.copyWith(
+                    chequeNumber: chequeController.text,
+                    shiftNumber: shiftController.text,
+                    sellPrice:
+                        double.tryParse(sellPriceController.text) ??
+                        ticket.sellPrice,
+                    soldDate: soldDateController.text,
+                    ticketObjectName: ticketObjectNameController.text,
+                  );
+                  context.read<DmdkBloc>().add(
+                    ProcessTicketSendEvent(updatedTicket),
+                  );
+                },
+              ),
             ),
-            const SizedBox(height: 12),
-            _buildEditableField(
-              'Дата продажи для ТМ',
-              soldDateController,
-              false,
-            ),
-            const SizedBox(height: 12),
-            _buildEditableField(
-              'Название вещи',
-              ticketObjectNameController,
-              false,
-            ),
-
-            const SizedBox(height: 12),
-            _buildEditableField('Номер чека', chequeController, false),
-            const SizedBox(height: 12),
-            _buildEditableField('Номер смены', shiftController, false),
-            const SizedBox(height: 12),
-            _buildEditableField('Сумма продажи', sellPriceController, false),
-            const SizedBox(height: 12),
-            _buildEditableField('УИН', uinController, true),
-            // Add more field widgets as necessary...
+            if (isLoading)
+              Container(
+                color: Colors.black.withOpacity(0.3),
+                child: const Center(child: CircularProgressIndicator()),
+              ),
           ],
-        ),
-        //   ],
-        // ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.play_arrow),
-        onPressed: () {
-          final updatedTicket = ticket.copyWith(
-            chequeNumber: chequeController.text,
-            shiftNumber: shiftController.text,
-            sellPrice:
-                double.tryParse(sellPriceController.text) ?? ticket.sellPrice,
-
-            soldDate: soldDateController.text,
-            ticketObjectName: ticketObjectNameController.text,
-          );
-          context.read<DmdkBloc>().add(ProcessTicketSendEvent(updatedTicket));
-        },
-      ),
+        );
+      },
     );
   }
 
@@ -118,7 +143,7 @@ class TicketDetailsContent extends StatelessWidget {
     return TextField(
       controller: controller,
       readOnly: readOnlyField,
-      style: readOnlyField ? TextStyle(color: Colors.grey) : null,
+      style: readOnlyField ? const TextStyle(color: Colors.grey) : null,
       decoration: InputDecoration(
         labelText: label,
         fillColor: Colors.grey.shade100,
