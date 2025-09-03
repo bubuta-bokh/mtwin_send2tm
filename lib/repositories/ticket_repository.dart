@@ -57,7 +57,7 @@ class TicketRepository {
           'searchQuery': searchQuery,
           'token': passPhrase,
           'qty': qty,
-          'doLog': true,
+          'doLog': false,
         },
       );
       final int? statusCode = response.statusCode;
@@ -98,14 +98,15 @@ class TicketRepository {
         'MarkTicketAsSentToTM',
         data: {
           'ticketObjectId': ticketDto.ticketObjectId,
-          'token': passPhrase,
-          'doLog': true,
+          'tokenPassed': passPhrase,
+          'doLog': false,
         },
+        options: Options(headers: {'Content-Type': 'application/json'}),
       );
       final int? statusCode = response.statusCode;
       if (statusCode! < 200 || statusCode > 400) {
         myLogger.e(
-          '[From ticket_repository] Line 106. Сервер бэк-энда вернул статус-код ошибки: $statusCode.',
+          '[From ticket_repository] Line 109. Сервер бэк-энда вернул статус-код ошибки: $statusCode.',
         );
         throw Exception(
           "Сервер бэк-энда вернул статус-код ошибки: $statusCode.",
@@ -117,7 +118,7 @@ class TicketRepository {
       return throw Exception(e);
     } on Exception catch (e) {
       myLogger.e(
-        '[From ticket_repository] Line 118. Ошибка во время процедуры сохранения статуса вещи как отправленной в ТМ на бэк-энде: $e',
+        '[From ticket_repository] Line 121. Ошибка во время процедуры сохранения статуса вещи как отправленной в ТМ на бэк-энде: $e',
       );
       return throw Exception(e);
     }
