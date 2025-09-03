@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
+import 'package:mtwin_send2tm/entities/my_logger.dart';
 import 'package:mtwin_send2tm/entities/ticket_dto.dart';
 
 class TicketRepository {
@@ -61,6 +62,9 @@ class TicketRepository {
       );
       final int? statusCode = response.statusCode;
       if (statusCode! < 200 || statusCode > 400) {
+        myLogger.e(
+          '[From ticket_repository] Line 66. Сервер бэк-энда вернул статус-код ошибки: $statusCode.',
+        );
         throw Exception(
           "Сервер бэк-энда вернул статус-код ошибки: $statusCode.",
         );
@@ -75,6 +79,10 @@ class TicketRepository {
     } on DioException catch (e) {
       return throw Exception(e);
     } on Exception catch (e) {
+      myLogger.e(
+        '[From ticket_repository] Line 83. Ошибка во время процедуры поиска проданных вещей на бэк-энде: $e',
+      );
+
       return throw Exception(e);
     }
   }
@@ -83,7 +91,9 @@ class TicketRepository {
     try {
       DateTime now = DateTime.now();
       String passPhrase = generatePassphrase(now);
-
+      myLogger.i(
+        '[From ticket_repository] Line 95. Marking ticket ${ticketDto.uin} as sent to TM. Pasphrase = $passPhrase',
+      );
       var response = await dio.post(
         'MarkTicketAsSentToTM',
         data: {
@@ -94,6 +104,9 @@ class TicketRepository {
       );
       final int? statusCode = response.statusCode;
       if (statusCode! < 200 || statusCode > 400) {
+        myLogger.e(
+          '[From ticket_repository] Line 106. Сервер бэк-энда вернул статус-код ошибки: $statusCode.',
+        );
         throw Exception(
           "Сервер бэк-энда вернул статус-код ошибки: $statusCode.",
         );
@@ -103,6 +116,9 @@ class TicketRepository {
     } on DioException catch (e) {
       return throw Exception(e);
     } on Exception catch (e) {
+      myLogger.e(
+        '[From ticket_repository] Line 118. Ошибка во время процедуры сохранения статуса вещи как отправленной в ТМ на бэк-энде: $e',
+      );
       return throw Exception(e);
     }
   }

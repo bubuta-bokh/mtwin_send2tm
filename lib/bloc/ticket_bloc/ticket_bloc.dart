@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 import 'package:mtwin_send2tm/bloc/dmdk_bloc/dmdk_bloc.dart';
+import 'package:mtwin_send2tm/entities/my_logger.dart';
 import 'package:mtwin_send2tm/entities/snackbar_global.dart';
 import 'package:mtwin_send2tm/entities/ticket_dto.dart';
 import 'package:mtwin_send2tm/repositories/ticket_repository.dart';
@@ -23,17 +24,11 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
     : super(TicketInitial()) {
     _dmdkSubscription = dmdkBloc.stream.listen((dmdkState) {
       if (dmdkState is DmdkFileSentWithSuccessState) {
-        //add(TicketMakeTOSentEvent(ticketDto: ticketDto!.first));
-        //logger.i('DMDK file was sent successfully!');
-        //var rslt = ticketRepository.markTicketAsSentToTM(dmdkState.ticketDto);
-        // SnackbarGlobal.show('TicketBloc L30', 10, 'warn');
-
         add(TicketMarkTOAsSentToTMEvent(ticketDto: dmdkState.ticketDto));
       }
     });
 
     on<TicketInitialEvent>((event, emit) async {
-      //logger.i('Inside ticket bloc line 21');
       var wasSuccessfull = await ticketRepository.prepareDio(event.envi);
     });
 
@@ -44,6 +39,9 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
           event.ticketDto,
         );
         if (succeded) {
+          myLogger.i(
+            '[From ticket_bloc] Line 43. Вещь успешно отмечена как отправленная на ТМ.',
+          );
           SnackbarGlobal.show(
             'Вещь успешно отмечена как отправленная на ТМ.',
             20,
@@ -57,6 +55,9 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
 
           emit(SearchTicketLoaded(ticketDto!));
         } else {
+          myLogger.w(
+            '[From ticket_bloc] Line 59. Вещь НЕ была отмечена как отправленная на ТМ.',
+          );
           SnackbarGlobal.show(
             'Вещь НЕ была отмечена как отправленная на ТМ.',
             20,
@@ -64,6 +65,9 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
           );
         }
       } catch (e) {
+        myLogger.e(
+          '[From ticket_bloc] Line 69. Ошибка во время процедуры сохранения статуса вещи как отправленной в ТМ на бэк-энде: $e',
+        );
         SnackbarGlobal.show(
           'Ошибка во время процедуры сохранения статуса вещи как отправленной в ТМ на бэк-энде: $e',
           20,
@@ -73,7 +77,7 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
     });
 
     on<TicketSearchEvent>((event, emit) async {
-      logger.i('Inside ticket bloc line 22');
+      //logger.i('Inside ticket bloc line 22');
       emit(SearchTicketLoading());
 
       try {
@@ -82,6 +86,9 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
           qty: event.qty ?? 5,
         );
         if (ticketDto == null) {
+          myLogger.w(
+            '[From ticket_bloc] Line 90. Не удалось получить данные с сервера.',
+          );
           SnackbarGlobal.show(
             'Не удалось получить данные с сервера.',
             20,
@@ -90,6 +97,9 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
           emit(SearchTicketError('Не удалось получить данные с сервера.'));
         } else {
           if (ticketDto!.isEmpty) {
+            myLogger.w(
+              '[From ticket_bloc] Line 101. По вашему запросу ничего не найдено.',
+            );
             SnackbarGlobal.show(
               'По вашему запросу ничего не найдено.',
               10,
@@ -98,6 +108,9 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
             emit(SearchTicketError('По вашему запросу ничего не найдено.'));
             return;
           } else {
+            myLogger.i(
+              '[From ticket_bloc] Line 112. Данные о вещах для отправки в ТМ с бэк-энда успешно получены!',
+            );
             SnackbarGlobal.show(
               'Данные о вещах для отправки в ТМ с бэк-энда успешно получены!',
               7,
@@ -107,7 +120,7 @@ class TicketBloc extends Bloc<TicketEvent, TicketState> {
           emit(SearchTicketLoaded(ticketDto!));
         }
       } catch (e) {
-        //myLogger.e(e.toString());
+        myLogger.e('[From ticket_bloc] Line 123. $e');
         SnackbarGlobal.show(e.toString(), 10, 'error');
         emit(SearchTicketError(e.toString()));
       }

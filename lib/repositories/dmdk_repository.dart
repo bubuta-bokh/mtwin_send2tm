@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:mtwin_send2tm/entities/my_logger.dart';
 import 'package:mtwin_send2tm/entities/ticket_dto.dart';
 import 'package:xml/xml.dart';
 import 'package:dio/dio.dart';
@@ -112,29 +113,21 @@ class DmdkRepository {
       final xmlString = document.toXmlString(pretty: true, indent: '  ');
       final xmlBytes = utf8.encode(xmlString);
 
-      //final file = File('$filePath\\${ticket.ticketObjectNumber}.xml');
+      myLogger.i(
+        '[From dmdk_repository] Line 117. XML content for ticket ${ticket.uin}:\n$xmlString',
+      );
 
-      //await file.create(recursive: true);
-      //await file.writeAsString(xmlString);
-      logger.i('XML file created in memory for ticket: ${ticket.uin}');
       return xmlBytes;
-    } on DioException catch (e) {
-      logger.e('Error during XML file creation: $e');
-      //final String msg = e.response?.data['exceptionMessage'];
-      //final String msg = e.message ?? e.response?.data['exceptionMessage'];
+    } on Exception catch (e) {
+      myLogger.e(
+        '[From dmdk_repository] Line 123. Exception during XML file creation: $e',
+      );
       rethrow;
     }
   }
 
   Future<String> sendChequeXmlFile({required Uint8List xmlBytes}) async {
     try {
-      // final formData = FormData.fromMap({
-      //   "xml_file": await MultipartFile.fromFile(
-      //     file.path,
-      //     filename: fileName, // optional, can use basename(file.path)
-      //   ),
-      // });
-
       final formData = FormData.fromMap({
         "xml_file": MultipartFile.fromBytes(
           xmlBytes,
@@ -153,20 +146,15 @@ class DmdkRepository {
           },
         ),
       );
-
-      logger.i("Status: ${response.statusCode}");
-      logger.i("Response: ${response.data}");
+      myLogger.i(
+        '[From dmdk_repository] Line 150. Status: ${response.statusCode}, Response: ${response.data}',
+      );
       return 'Status: ${response.statusCode} Response: ${response.data}';
-    } on DioException catch (e) {
-      logger.e('Error during XML file sending to TM: $e');
+    } on Exception catch (e) {
+      myLogger.e(
+        '[From dmdk_repository] Line 155. Error during XML file sending to TM: $e',
+      );
       rethrow;
-      // final String msg = e.message ?? e.response?.data['exceptionMessage'];
-      // if (e.response?.statusCode == 404) {
-      //   logger.e(msg);
-      // } else {
-      //   logger.e(msg);
-      // }
-      // return msg;
     }
   }
 }

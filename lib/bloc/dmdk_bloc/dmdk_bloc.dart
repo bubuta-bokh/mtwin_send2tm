@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:logger/logger.dart';
+import 'package:mtwin_send2tm/entities/my_logger.dart';
 import 'package:mtwin_send2tm/entities/snackbar_global.dart';
 import 'package:mtwin_send2tm/entities/ticket_dto.dart';
 import 'package:mtwin_send2tm/repositories/dmdk_repository.dart';
@@ -27,13 +28,16 @@ class DmdkBloc extends Bloc<DmdkEvent, DmdkState> {
     });
 
     on<ProcessTicketSendEvent>((event, emit) async {
-      logger.i("Inside BLOC, before xml is born");
+      myLogger.i('[From dmdk_bloc] Line 31. Before xml is born.');
       //emit(DmdkFileSentWithSuccessState(ticketDto: event.ticketForTM));
       //return;
-      emit(DmdkFileSentWithSuccessState(ticketDto: event.ticketForTM));
+
       try {
         var bytes = await dmdkRepository.createChequeXmlFile(
           ticket: event.ticketForTM,
+        );
+        myLogger.i(
+          '[From dmdk_bloc] Line 39. ✅ Файл успешно создан в памяти. Размер: ${bytes.length} байт.',
         );
         SnackbarGlobal.show(
           '✅ Файл успешно создан в памяти. Размер: ${bytes.length} байт.',
@@ -44,6 +48,9 @@ class DmdkBloc extends Bloc<DmdkEvent, DmdkState> {
         try {
           var rslt = await dmdkRepository.sendChequeXmlFile(xmlBytes: bytes);
           if (!rslt.contains('error')) {
+            myLogger.i(
+              '[From dmdk_bloc] Line 50. ✅ Файл успешно отправлен в ТМ: $rslt,',
+            );
             SnackbarGlobal.show(
               '✅ Файл успешно отправлен в ТМ: $rslt,',
               20,
@@ -52,9 +59,15 @@ class DmdkBloc extends Bloc<DmdkEvent, DmdkState> {
 
             emit(DmdkFileSentWithSuccessState(ticketDto: event.ticketForTM));
           } else {
+            myLogger.e(
+              '[From dmdk_bloc] Line 61. ❌ Файл НЕ был отправлен в ТМ. Ошибка: $rslt',
+            );
             SnackbarGlobal.show(rslt, 20, 'error');
           }
         } catch (e, s) {
+          myLogger.e(
+            '[From dmdk_bloc] Line 67. ❌ Файл НЕ был отправлен в ТМ. Ошибка: $e, stack trace: $s',
+          );
           SnackbarGlobal.show(
             'Не удалось отправить XML файл в ТМ. Ошибка: $e, stack trace: $s',
             20,
@@ -62,13 +75,14 @@ class DmdkBloc extends Bloc<DmdkEvent, DmdkState> {
           );
         }
       } catch (e, s) {
-        //myLogger.e(e.toString());
+        myLogger.e(
+          '[From dmdk_bloc] Line 77. ❌ Не удалось создать XML-файл, ошибка: $e, stack trace: $s',
+        );
         SnackbarGlobal.show(
           'Не удалось создать XML-файл, ошибка: $e, stack trace: $s',
           20,
           'error',
         );
-        //var isSuccessfull = await dmdkRepository.makeHealthRequest();
       }
     });
   }

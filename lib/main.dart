@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:mtwin_send2tm/bloc/dmdk_bloc/dmdk_bloc.dart';
 import 'package:mtwin_send2tm/bloc/ticket_bloc/ticket_bloc.dart';
+import 'package:mtwin_send2tm/entities/my_logger.dart';
 import 'package:mtwin_send2tm/entities/snackbar_global.dart';
 import 'dart:ui';
 
@@ -61,7 +62,7 @@ void main() async {
         ],
         child: MyApp(
           //authRepository: authRepository,
-          logger: logger,
+          logger: myLogger,
           //isarServiceRepository: isarServiceRepository,
         ),
       ),
@@ -101,37 +102,16 @@ class MyApp extends StatelessWidget {
   //final AuthRepository authRepository;
 
   final Logger logger;
-  //final IsarService isarServiceRepository;
-  const MyApp({
-    Key? key,
 
-    //  required this.authRepository,
-    required this.logger,
-    //required this.isarServiceRepository
-  }) : super(key: key);
+  const MyApp({Key? key, required this.logger}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    // if (context.watch<AuthenticationBloc>().state is AuthenticationLoading) {
-    //   context
-    //       .read<AuthenticationBloc>()
-    //       .add(GetEnvironmentVarEvent(envi: config.currentEnvironment));
-    //   //context.read<CashboxBloc>().add(CashboxFirstLoad());
-    // }
-    // if (context.watch<CompanyBloc>().state
-    //     is CompanyAllDmdkDictsSuccessfullyLoadedState) {
-    //   context.read<DmdkBloc>().add(RequestToSetStunnelConfigParamsEvent(
-    //       stunnelPort: config.stunnelPort,
-    //       certificateSerial: config.certificateSerial));
-    // }
     return MaterialApp.router(
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
       locale: const Locale('ru', 'RU'),
       theme: ThemeData(fontFamily: 'Rubik', primarySwatch: Colors.blueGrey),
-
-      //supportedLocales: const [Locale('ru', '')],
       scaffoldMessengerKey: SnackbarGlobal.key,
     );
   }
